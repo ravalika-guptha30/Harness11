@@ -21,9 +21,11 @@ pipeline:
                   identifier: echo
                   name: echo
                   spec:
+                    shell: Sh
                     command: echo hello world
                   timeout: ""
                   type: Run
+                  description: hiiiiii
           platform:
             arch: Amd64
             os: Linux
