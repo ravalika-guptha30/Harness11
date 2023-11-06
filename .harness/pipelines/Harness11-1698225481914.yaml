@@ -1,0 +1,35 @@
+pipeline:
+  identifier: Build_Harness11_1698225486600
+  name: Build Harness11
+  orgIdentifier: default
+  projectIdentifier: default_project
+  properties:
+    ci:
+      codebase:
+        build: <+input>
+        connectorRef: account.Github_OAuth_1698225471208
+        repoName: Harness11
+  stages:
+    - stage:
+        identifier: build
+        name: build
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  identifier: echo
+                  name: Test
+                  spec:
+                    shell: Bash
+                    command: echo Hi
+                  timeout: ""
+                  type: Run
+                  description: hiiiiiiiiiiiiiiiiiiiii..................................
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+        type: CI
