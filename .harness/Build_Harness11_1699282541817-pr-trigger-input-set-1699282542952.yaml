@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_Harness11_1699282541817-pr-trigger-input-set
+  identifier: Build_Harness11_1699282541817prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: demo
+  pipeline:
+    identifier: Build_Harness11_1699282541817
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
