@@ -24,10 +24,31 @@ pipeline:
                     command: echo hello world
                   timeout: ""
                   type: Run
+              - step:
+                  type: GitClone
+                  name: GitClone_1
+                  identifier: GitClone_1
+                  spec:
+                    connectorRef: account.Github_OAuth_1699282247887
+                    repoName: Harness11
+                    build:
+                      type: branch
+                      spec:
+                        branch: main
+                  description: test
+              - step:
+                  type: Run
+                  name: Run_2
+                  identifier: Run_2
+                  spec:
+                    shell: Sh
+                    command: mvn clean install
+                  description: Run
           platform:
-            arch: Amd64
             os: Linux
+            arch: Amd64
           runtime:
-            spec: {}
             type: Cloud
+            spec: {}
         type: CI
+        description: ""
