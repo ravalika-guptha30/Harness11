@@ -30,7 +30,7 @@ pipeline:
                   identifier: GitClone_1
                   spec:
                     connectorRef: account.Github_OAuth_1699282247887
-                    repoName: Harness11
+                    repoName: ravalika-guptha30/Harness11
                     build:
                       type: branch
                       spec:
