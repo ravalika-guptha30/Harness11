@@ -1,0 +1,54 @@
+pipeline:
+  identifier: Build_Harness11_1699282541817
+  name: Build Harness11
+  orgIdentifier: default
+  projectIdentifier: demo
+  properties:
+    ci:
+      codebase:
+        build: <+input>
+        connectorRef: account.Github
+        repoName: Harness11
+  stages:
+    - stage:
+        identifier: build
+        name: build
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  identifier: echo
+                  name: echo
+                  spec:
+                    command: echo hello world
+                  timeout: ""
+                  type: Run
+              - step:
+                  type: GitClone
+                  name: GitClone_1
+                  identifier: GitClone_1
+                  spec:
+                    connectorRef: account.Github_OAuth_1699282247887
+                    repoName: ravalika-guptha30/Harness11
+                    build:
+                      type: branch
+                      spec:
+                        branch: main
+                  description: test
+              - step:
+                  type: Run
+                  name: Run_2
+                  identifier: Run_2
+                  spec:
+                    shell: Sh
+                    command: mvn clean install
+                  description: Run
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+        type: CI
+        description: ""
