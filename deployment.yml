@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harness11
+  labels:
+    app: harness11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harness11
+  template:
+    metadata:
+      labels:
+        app: harness11
+    spec:
+      containers:
+      - name: harness11
+        image: https://hub.docker.com/repository/docker/vivek756/harness:latest
+        ports:
+        - containerPort: 8080
