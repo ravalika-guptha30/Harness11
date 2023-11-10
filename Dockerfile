@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre
+FROM openjdk:11-jdk
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
