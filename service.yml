@@ -5,8 +5,8 @@ metadata:
 spec:
   selector:
     app: harness11
-    ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3010
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3010
   type: LoadBalancer
