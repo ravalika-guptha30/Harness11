@@ -122,8 +122,9 @@ pipeline:
                   name: Selenium
                   identifier: Selenium
                   spec:
+                    shell: Sh
                     command: |-
-                      cd harness/lib
+                      cd lib
                       chmod +x resources/chromedriver.exe
                       java -jar demo-project.jar
     - stage:
