@@ -4,10 +4,15 @@ pipeline:
   projectIdentifier: default_project
   orgIdentifier: default
   tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: Ravalika
+        build: <+input>
   stages:
     - stage:
-        name: Build and test
-        identifier: Build_and_test
+        name: Clone
+        identifier: Clone
         description: ""
         type: CI
         spec:
@@ -30,23 +35,13 @@ pipeline:
                       type: branch
                       spec:
                         branch: main
-              - step:
-                  type: Run
-                  name: Run_1
-                  identifier: Run_1
-                  spec:
-                    shell: Bash
-                    command: |-
-                      echo maven build
-                      mvn -version
-                      mvn clean install
     - stage:
-        name: jmeter
-        identifier: jmeter
+        name: Maven build
+        identifier: mavenbuild
         description: ""
         type: CI
         spec:
-          cloneCodebase: true
+          cloneCodebase: false
           platform:
             os: Linux
             arch: Arm64
@@ -57,12 +52,101 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Run_1
-                  identifier: Run_1
+                  name: maven build
+                  identifier: mavenbuild
                   spec:
-                    shell: Bash
+                    command: mvn clean install
+    - stage:
+        name: SAST - SonarQube
+        identifier: SAST_SonarQube
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: SAST - SonarQube
+                  identifier: SAST_SonarQube
+                  spec:
                     command: |-
-                      set -e
+                      mvn clean install
+                      mvn sonar:sonar -Dsonar.projectKey=sonar -Dsonar.host.url=https://erasonar-virtusaonline.msappproxy.net/sonar -Dsonar.login=fdf7b6aa910530dc81a1bcaa1882dd5950454a8d
+    - stage:
+        name: DAST scan - ZAP
+        identifier: DASTscan_ZAP
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: DAST scan - ZAP
+                  identifier: DASTscan_ZAP
+                  spec:
+                    command: |-
+                      cd /harness/Zap/ZAP_2.14.0
+                      java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl https://sites.google.com/chromium.org/driver/ -quickout /harness/Zap/report.html
+    - stage:
+        name: Selenium
+        identifier: Selenium
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Windows
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Selenium
+                  identifier: Selenium
+                  spec:
+                    command: |-
+                      cd /harness/lib
+                      chmod +x resources/chromedriver.exe
+                      java -jar demo-project.jar
+    - stage:
+        name: Performance test - Jmeter
+        identifier: performancetest_Jmeter
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: performance test - Jmeter
+                  identifier: performancetest_Jmeter
+                  spec:
+                    command: |-
                       cd /harness/jmeter
                       rm -f testresults.jtl
                       chmod +x jmeter
@@ -70,10 +154,3 @@ pipeline:
                       rm -rf /harness/jmeter/report
                       /harness/jmeter/jmeter -g /harness/jmeter/testresults.jtl -e -o /harness/jmeter/report
                       ls -l /harness/jmeter/report
-                      ls
-                      cat /harness/jmeter/report/index.html
-  properties:
-    ci:
-      codebase:
-        connectorRef: Ravalika
-        build: <+input>
