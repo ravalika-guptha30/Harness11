@@ -64,12 +64,12 @@ pipeline:
         spec:
           deploymentType: Kubernetes
           service:
-            serviceRef: harness_addressbook
+            serviceRef: Reactservice
           environment:
-            environmentRef: addressbook
+            environmentRef: harnessdevenv
             deployToAll: false
             infrastructureDefinitions:
-              - identifier: addressbook
+              - identifier: harnessk8sinfra
           execution:
             steps:
               - stepGroup:
@@ -104,6 +104,7 @@ pipeline:
                         timeout: 10m
                         spec:
                           skipDryRun: false
+            rollbackSteps: []
           rollbackSteps:
             - step:
                 identifier: rollbackCanaryDelete
