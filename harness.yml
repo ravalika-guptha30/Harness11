@@ -88,7 +88,7 @@ pipeline:
                   name: BuildAndPushDockerRegistry_1
                   spec:
                     connectorRef: Docker_Registry
-                    repo: vivek756/harness
+                    repo: dockerhub_username/dockerhub_repositoryname
                     tags:
                       - latest
     - stage:
