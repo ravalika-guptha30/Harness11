@@ -52,7 +52,7 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: build
+                  name: build_step
                   identifier: build
                   spec:
                     command: mvn clean install
@@ -88,7 +88,7 @@ pipeline:
                   name: BuildAndPushDockerRegistry_1
                   spec:
                     connectorRef: Docker_Registry
-                    repo: dockerhub_username/dockerhub_repositoryname
+                    repo: vivek756/harness
                     tags:
                       - latest
     - stage:
@@ -176,7 +176,7 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: SonarQube
+                  name: SonarQube_step
                   identifier: SonarQube
                   spec:
                     command: >-
@@ -202,7 +202,7 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Selenium
+                  name: Selenium_step
                   identifier: Selenium
                   spec:
                     command: |-
@@ -226,7 +226,7 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Jmeter
+                  name: Jmeter_step
                   identifier: Jmeter
                   spec:
                     command: >-
@@ -262,7 +262,7 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: ZAP
+                  name: ZAP_step
                   identifier: ZAP
                   spec:
                     command: >-
