@@ -1,0 +1,272 @@
+pipeline:
+  name: Sample_Jenkins_Pipeline
+  identifier: Sample_Jenkins_Pipeline
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: github_connector
+        build: <+input>
+  stages:
+    - stage:
+        name: Git_Clone
+        identifier: Git_Clone
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: GitClone
+                  name: GitClone_step
+                  identifier: GitClone_step
+                  spec:
+                    connectorRef: github_connector
+                    build:
+                      type: branch
+                      spec:
+                        branch: main
+    - stage:
+        name: Build
+        identifier: build
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: build
+                  identifier: build
+                  spec:
+                    command: mvn clean install
+    - stage:
+        identifier: Build_and_push
+        type: CI
+        name: Build and push
+        description: ''
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  identifier: Maven_Build
+                  type: Run
+                  name: Maven Build
+                  spec:
+                    shell: Sh
+                    command: |-
+                      echo maven build
+                      mvn -version
+                      mvn clean install
+                  description: Maven Build
+              - step:
+                  identifier: BuildAndPushDockerRegistry_1
+                  type: BuildAndPushDockerRegistry
+                  name: BuildAndPushDockerRegistry_1
+                  spec:
+                    connectorRef: Docker_Registry
+                    repo: vivek756/harness
+                    tags:
+                      - latest
+    - stage:
+        identifier: Deployment_with_GCP_cluster
+        type: Deployment
+        name: Deployment with GCP cluster
+        description: ''
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: harness_addressbook
+          environment:
+            environmentRef: addressbook
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: addressbook
+          execution:
+            steps:
+              - stepGroup:
+                  identifier: canaryDepoyment
+                  name: Canary Deployment
+                  steps:
+                    - step:
+                        identifier: canaryDeployment
+                        type: K8sCanaryDeploy
+                        name: Canary Deployment
+                        timeout: 10m
+                        spec:
+                          instanceSelection:
+                            type: Count
+                            spec:
+                              count: 1
+                          skipDryRun: false
+                    - step:
+                        identifier: canaryDelete
+                        type: K8sCanaryDelete
+                        name: Canary Delete
+                        timeout: 10m
+                        spec: {}
+              - stepGroup:
+                  identifier: primaryDepoyment
+                  name: Primary Deployment
+                  steps:
+                    - step:
+                        identifier: rollingDeployment
+                        type: K8sRollingDeploy
+                        name: Rolling Deployment
+                        timeout: 10m
+                        spec:
+                          skipDryRun: false
+          rollbackSteps:
+            - step:
+                identifier: rollbackCanaryDelete
+                type: K8sCanaryDelete
+                name: Canary Delete
+                timeout: 10m
+                spec: {}
+            - step:
+                identifier: rollingRollback
+                type: K8sRollingRollback
+                name: Rolling Rollback
+                timeout: 10m
+                spec: {}
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+    - stage:
+        name: SonarQube
+        identifier: SonarQube
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: SonarQube
+                  identifier: SonarQube
+                  spec:
+                    command: >-
+                      mvn clean install 
+
+                      mvn sonar:sonar -Dsonar.projectKey=sonar
+                      -Dsonar.host.url=https://erasonar-virtusaonline.msappproxy.net/sonar 
+                      -Dsonar.login=fdf7b6aa910530dc81a1bcaa1882dd5950454a8d
+    - stage:
+        name: Selenium
+        identifier: Selenium
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Windows
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Selenium
+                  identifier: Selenium
+                  spec:
+                    command: |-
+                      cd lib 
+                      chmod +x resources/chromedriver.exe 
+                      java -jar demo-project.jar
+    - stage:
+        name: Jmeter
+        identifier: Jmeter
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Jmeter
+                  identifier: Jmeter
+                  spec:
+                    command: >-
+                      cd /harness/jmeter 
+
+                      rm -f testresults.jtl 
+
+                      chmod +x jmeter 
+
+                      /harness/jmeter/jmeter -n -t CSVSample.jmx -l
+                      testresults.jtl 
+
+                      rm -rf /harness/jmeter/report 
+
+                      /harness/jmeter/jmeter -g /harness/jmeter/testresults.jtl
+                      -e -o /harness/jmeter/report 
+
+                      ls -l /harness/jmeter/report
+    - stage:
+        name: ZAP
+        identifier: ZAP
+        description: ''
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: ZAP
+                  identifier: ZAP
+                  spec:
+                    command: >-
+                      cd /harness/Zap/ZAP_2.14.0 
+                      java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl
+                      https://sites.google.com/chromium.org/driver/ -quickout
+                      /harness/Zap/report.html
