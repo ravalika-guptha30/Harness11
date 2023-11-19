@@ -13,7 +13,7 @@ pipeline:
     - stage:
         name: Git_Clone
         identifier: Git_Clone
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -30,7 +30,7 @@ pipeline:
                   name: GitClone_step
                   identifier: GitClone_step
                   spec:
-                    connectorRef: github_connector
+                    connectorRef: Ravalika
                     build:
                       type: branch
                       spec:
@@ -38,7 +38,7 @@ pipeline:
     - stage:
         name: Build
         identifier: build
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -60,7 +60,7 @@ pipeline:
         identifier: Build_and_push
         type: CI
         name: Build and push
-        description: ''
+        description: ""
         spec:
           cloneCodebase: true
           platform:
@@ -95,7 +95,7 @@ pipeline:
         identifier: Deployment_with_GCP_cluster
         type: Deployment
         name: Deployment with GCP cluster
-        description: ''
+        description: ""
         spec:
           deploymentType: Kubernetes
           service:
@@ -162,7 +162,7 @@ pipeline:
     - stage:
         name: SonarQube
         identifier: SonarQube
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -179,16 +179,13 @@ pipeline:
                   name: SonarQube_step
                   identifier: SonarQube
                   spec:
-                    command: >-
+                    command: |-
                       mvn clean install 
-
-                      mvn sonar:sonar -Dsonar.projectKey=sonar
-                      -Dsonar.host.url=https://erasonar-virtusaonline.msappproxy.net/sonar 
-                      -Dsonar.login=fdf7b6aa910530dc81a1bcaa1882dd5950454a8d
+                      mvn sonar:sonar -Dsonar.projectKey=sonar -Dsonar.host.url=https://erasonar-virtusaonline.msappproxy.net/sonar  -Dsonar.login=fdf7b6aa910530dc81a1bcaa1882dd5950454a8d
     - stage:
         name: Selenium
         identifier: Selenium
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -212,7 +209,7 @@ pipeline:
     - stage:
         name: Jmeter
         identifier: Jmeter
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -229,26 +226,18 @@ pipeline:
                   name: Jmeter_step
                   identifier: Jmeter
                   spec:
-                    command: >-
+                    command: |-
                       cd /harness/jmeter 
-
                       rm -f testresults.jtl 
-
                       chmod +x jmeter 
-
-                      /harness/jmeter/jmeter -n -t CSVSample.jmx -l
-                      testresults.jtl 
-
+                      /harness/jmeter/jmeter -n -t CSVSample.jmx -l testresults.jtl 
                       rm -rf /harness/jmeter/report 
-
-                      /harness/jmeter/jmeter -g /harness/jmeter/testresults.jtl
-                      -e -o /harness/jmeter/report 
-
+                      /harness/jmeter/jmeter -g /harness/jmeter/testresults.jtl -e -o /harness/jmeter/report 
                       ls -l /harness/jmeter/report
     - stage:
         name: ZAP
         identifier: ZAP
-        description: ''
+        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -265,8 +254,4 @@ pipeline:
                   name: ZAP_step
                   identifier: ZAP
                   spec:
-                    command: >-
-                      cd /harness/Zap/ZAP_2.14.0 
-                      java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl
-                      https://sites.google.com/chromium.org/driver/ -quickout
-                      /harness/Zap/report.html
+                    command: cd /harness/Zap/ZAP_2.14.0  java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl https://sites.google.com/chromium.org/driver/ -quickout /harness/Zap/report.html
