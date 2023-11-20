@@ -254,4 +254,4 @@ pipeline:
                   name: ZAP_step
                   identifier: ZAP
                   spec:
-                    command: cd /harness/Zap/ZAP_2.14.0  java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl https://sites.google.com/chromium.org/driver/ -quickout /harness/Zap/report.html
+                    command: cd /harness/Zap/ZAP_2.14.0  java -jar zap-2.14.0.jar -cmd -port 8082 -quickurl http://localhost:8083/ -quickout /harness/Zap/report.html
